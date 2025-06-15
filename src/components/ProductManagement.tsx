@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { useStore } from '@/context/StoreContext';
 import { Product } from '@/types';
@@ -7,6 +8,7 @@ import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { useToast } from '@/hooks/use-toast';
+import ImageUpload from './ImageUpload';
 
 const ProductManagement = () => {
   const { products, addProduct, updateProduct, deleteProduct } = useStore();
@@ -16,6 +18,7 @@ const ProductManagement = () => {
     name: '',
     description: '',
     price: '',
+    image: '',
     sizes: { P: '', M: '', G: '', GG: '', XG: '' }
   });
 
@@ -24,6 +27,7 @@ const ProductManagement = () => {
       name: '',
       description: '',
       price: '',
+      image: '',
       sizes: { P: '', M: '', G: '', GG: '', XG: '' }
     });
     setIsEditing(null);
@@ -45,6 +49,7 @@ const ProductManagement = () => {
       name: formData.name,
       description: formData.description,
       price: parseFloat(formData.price),
+      image: formData.image,
       sizes: {
         P: parseInt(formData.sizes.P) || 0,
         M: parseInt(formData.sizes.M) || 0,
@@ -76,6 +81,7 @@ const ProductManagement = () => {
       name: product.name,
       description: product.description,
       price: product.price.toString(),
+      image: product.image || '',
       sizes: {
         P: product.sizes.P.toString(),
         M: product.sizes.M.toString(),
@@ -108,6 +114,12 @@ const ProductManagement = () => {
         </CardHeader>
         <CardContent>
           <form onSubmit={handleSubmit} className="space-y-4">
+            <ImageUpload
+              onImageSelect={(imageUrl) => setFormData(prev => ({ ...prev, image: imageUrl }))}
+              currentImage={formData.image}
+              onImageRemove={() => setFormData(prev => ({ ...prev, image: '' }))}
+            />
+
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
                 <Label htmlFor="name">Nome do Produto</Label>
@@ -194,6 +206,14 @@ const ProductManagement = () => {
                 const totalStock = Object.values(product.sizes).reduce((sum, qty) => sum + qty, 0);
                 return (
                   <div key={product.id} className="border rounded-lg p-4 hover:shadow-md transition-shadow">
+                    {product.image && (
+                      <img 
+                        src={product.image} 
+                        alt={product.name}
+                        className="w-full h-32 object-cover rounded-lg mb-3"
+                      />
+                    )}
+                    
                     <div className="flex justify-between items-start mb-3">
                       <div>
                         <h3 className="font-semibold text-lg">{product.name}</h3>
