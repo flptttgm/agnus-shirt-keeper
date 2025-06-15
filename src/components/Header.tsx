@@ -7,11 +7,11 @@ const Header = () => {
       <div className="container mx-auto px-4 py-6">
         <div className="flex items-center justify-between">
           <div className="flex items-center space-x-4">
-            <div className="w-12 h-12 bg-white rounded-full flex items-center justify-center p-2">
+            <div className="h-12">
               <img 
-                src="/lovable-uploads/2350fbd4-1615-4a7d-911f-53dc992630cf.png" 
+                src="/lovable-uploads/6b49d302-7ef9-4560-af22-061bdaf8c88d.png" 
                 alt="Badboy Logo" 
-                className="w-full h-full object-contain"
+                className="h-full w-auto object-contain"
               />
             </div>
             <div>
