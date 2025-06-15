@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { useStore } from '@/context/StoreContext';
 
@@ -89,7 +88,6 @@ const Dashboard = () => {
                 <tr>
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Produto</th>
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Preço</th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">PP</th>
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">P</th>
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">M</th>
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">G</th>
@@ -110,7 +108,6 @@ const Dashboard = () => {
                         </div>
                       </td>
                       <td className="px-6 py-4 text-sm text-gray-900">R$ {product.price.toFixed(2)}</td>
-                      <td className="px-6 py-4 text-sm text-gray-900">{product.sizes.PP}</td>
                       <td className="px-6 py-4 text-sm text-gray-900">{product.sizes.P}</td>
                       <td className="px-6 py-4 text-sm text-gray-900">{product.sizes.M}</td>
                       <td className="px-6 py-4 text-sm text-gray-900">{product.sizes.G}</td>

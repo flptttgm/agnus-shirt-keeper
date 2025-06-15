@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { useStore } from '@/context/StoreContext';
 import { Product } from '@/types';
@@ -17,7 +16,7 @@ const ProductManagement = () => {
     name: '',
     description: '',
     price: '',
-    sizes: { PP: '', P: '', M: '', G: '', GG: '', XG: '' }
+    sizes: { P: '', M: '', G: '', GG: '', XG: '' }
   });
 
   const resetForm = () => {
@@ -25,7 +24,7 @@ const ProductManagement = () => {
       name: '',
       description: '',
       price: '',
-      sizes: { PP: '', P: '', M: '', G: '', GG: '', XG: '' }
+      sizes: { P: '', M: '', G: '', GG: '', XG: '' }
     });
     setIsEditing(null);
   };
@@ -47,7 +46,6 @@ const ProductManagement = () => {
       description: formData.description,
       price: parseFloat(formData.price),
       sizes: {
-        PP: parseInt(formData.sizes.PP) || 0,
         P: parseInt(formData.sizes.P) || 0,
         M: parseInt(formData.sizes.M) || 0,
         G: parseInt(formData.sizes.G) || 0,
@@ -79,7 +77,6 @@ const ProductManagement = () => {
       description: product.description,
       price: product.price.toString(),
       sizes: {
-        PP: product.sizes.PP.toString(),
         P: product.sizes.P.toString(),
         M: product.sizes.M.toString(),
         G: product.sizes.G.toString(),
@@ -149,7 +146,7 @@ const ProductManagement = () => {
 
             <div>
               <Label>Quantidades por Tamanho</Label>
-              <div className="grid grid-cols-2 md:grid-cols-6 gap-4 mt-2">
+              <div className="grid grid-cols-2 md:grid-cols-5 gap-4 mt-2">
                 {Object.keys(formData.sizes).map((size) => (
                   <div key={size}>
                     <Label htmlFor={size} className="text-sm">{size}</Label>
@@ -208,7 +205,7 @@ const ProductManagement = () => {
                       </div>
                     </div>
                     
-                    <div className="grid grid-cols-6 gap-2 mb-3">
+                    <div className="grid grid-cols-5 gap-2 mb-3">
                       {Object.entries(product.sizes).map(([size, qty]) => (
                         <div key={size} className="text-center">
                           <div className="text-xs font-medium text-gray-600">{size}</div>

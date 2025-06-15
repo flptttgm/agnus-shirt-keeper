@@ -6,7 +6,6 @@ export interface Product {
   price: number;
   image?: string;
   sizes: {
-    PP: number;
     P: number;
     M: number;
     G: number;
