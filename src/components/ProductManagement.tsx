@@ -19,7 +19,7 @@ const ProductManagement = () => {
     description: '',
     price: '',
     image: '',
-    sizes: { P: '', M: '', G: '', GG: '', XG: '' }
+    sizes: { P: '', M: '', G: '', GG: '', XG: '', XGG: '' }
   });
 
   const resetForm = () => {
@@ -28,7 +28,7 @@ const ProductManagement = () => {
       description: '',
       price: '',
       image: '',
-      sizes: { P: '', M: '', G: '', GG: '', XG: '' }
+      sizes: { P: '', M: '', G: '', GG: '', XG: '', XGG: '' }
     });
     setIsEditing(null);
   };
@@ -56,6 +56,7 @@ const ProductManagement = () => {
         G: parseInt(formData.sizes.G) || 0,
         GG: parseInt(formData.sizes.GG) || 0,
         XG: parseInt(formData.sizes.XG) || 0,
+        XGG: parseInt(formData.sizes.XGG) || 0,
       }
     };
 
@@ -88,6 +89,7 @@ const ProductManagement = () => {
         G: product.sizes.G.toString(),
         GG: product.sizes.GG.toString(),
         XG: product.sizes.XG.toString(),
+        XGG: product.sizes.XGG.toString(),
       }
     });
     setIsEditing(product.id);
@@ -158,7 +160,7 @@ const ProductManagement = () => {
 
             <div>
               <Label>Quantidades por Tamanho</Label>
-              <div className="grid grid-cols-2 md:grid-cols-5 gap-4 mt-2">
+              <div className="grid grid-cols-2 md:grid-cols-6 gap-4 mt-2">
                 {Object.keys(formData.sizes).map((size) => (
                   <div key={size}>
                     <Label htmlFor={size} className="text-sm">{size}</Label>
@@ -225,7 +227,7 @@ const ProductManagement = () => {
                       </div>
                     </div>
                     
-                    <div className="grid grid-cols-5 gap-2 mb-3">
+                    <div className="grid grid-cols-6 gap-2 mb-3">
                       {Object.entries(product.sizes).map(([size, qty]) => (
                         <div key={size} className="text-center">
                           <div className="text-xs font-medium text-gray-600">{size}</div>
