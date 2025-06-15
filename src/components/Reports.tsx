@@ -2,6 +2,8 @@ import React from 'react';
 import { useStore } from '@/context/StoreContext';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
+import { ChartContainer, ChartTooltip, ChartTooltipContent } from '@/components/ui/chart';
+import { BarChart, Bar, XAxis, YAxis, ResponsiveContainer } from 'recharts';
 
 const Reports = () => {
   const { products, sales } = useStore();
@@ -40,7 +42,7 @@ const Reports = () => {
     return acc;
   }, {} as Record<string, { quantity: number; revenue: number }>);
 
-  // Vendas por período (últimos 7 dias)
+  // Vendas por período (últimos 7 dias) - formatado para o gráfico
   const last7Days = Array.from({ length: 7 }, (_, i) => {
     const date = new Date();
     date.setDate(date.getDate() - i);
@@ -53,6 +55,11 @@ const Reports = () => {
     );
     return {
       date,
+      displayDate: new Date(date).toLocaleDateString('pt-BR', { 
+        weekday: 'short', 
+        day: '2-digit', 
+        month: '2-digit' 
+      }),
       quantity: daysSales.reduce((sum, sale) => sum + sale.quantity, 0),
       revenue: daysSales.reduce((sum, sale) => sum + sale.totalPrice, 0),
     };
@@ -61,6 +68,17 @@ const Reports = () => {
   // Vendas ordenadas por data (da mais recente para a mais antiga)
   const salesByDate = [...sales]
     .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
+
+  const chartConfig = {
+    revenue: {
+      label: "Receita",
+      color: "#22c55e",
+    },
+    quantity: {
+      label: "Quantidade",
+      color: "#3b82f6",
+    },
+  };
 
   return (
     <div className="p-6 space-y-6">
@@ -157,11 +175,65 @@ const Reports = () => {
         </Card>
       </div>
 
-      {/* Vendas dos Últimos 7 Dias */}
+      {/* Gráfico de Vendas dos Últimos 7 Dias */}
+      <Card>
+        <CardHeader>
+          <CardTitle>Gráfico de Vendas dos Últimos 7 Dias</CardTitle>
+          <CardDescription>Evolução visual das vendas e receita</CardDescription>
+        </CardHeader>
+        <CardContent>
+          <ChartContainer config={chartConfig} className="h-[300px] w-full">
+            <ResponsiveContainer width="100%" height="100%">
+              <BarChart data={dailySales} margin={{ top: 20, right: 30, left: 20, bottom: 5 }}>
+                <XAxis 
+                  dataKey="displayDate" 
+                  tick={{ fontSize: 12 }}
+                  axisLine={false}
+                  tickLine={false}
+                />
+                <YAxis 
+                  yAxisId="left"
+                  orientation="left"
+                  tick={{ fontSize: 12 }}
+                  axisLine={false}
+                  tickLine={false}
+                />
+                <YAxis 
+                  yAxisId="right"
+                  orientation="right"
+                  tick={{ fontSize: 12 }}
+                  axisLine={false}
+                  tickLine={false}
+                />
+                <ChartTooltip 
+                  content={<ChartTooltipContent />}
+                  cursor={{ fill: 'rgba(0, 0, 0, 0.1)' }}
+                />
+                <Bar 
+                  yAxisId="left"
+                  dataKey="quantity" 
+                  fill="var(--color-quantity)"
+                  name="Quantidade"
+                  radius={[4, 4, 0, 0]}
+                />
+                <Bar 
+                  yAxisId="right"
+                  dataKey="revenue" 
+                  fill="var(--color-revenue)"
+                  name="Receita (R$)"
+                  radius={[4, 4, 0, 0]}
+                />
+              </BarChart>
+            </ResponsiveContainer>
+          </ChartContainer>
+        </CardContent>
+      </Card>
+
+      {/* Vendas dos Últimos 7 Dias - Tabela */}
       <Card>
         <CardHeader>
           <CardTitle>Vendas dos Últimos 7 Dias</CardTitle>
-          <CardDescription>Evolução diária das vendas</CardDescription>
+          <CardDescription>Dados detalhados da evolução diária</CardDescription>
         </CardHeader>
         <CardContent>
           <div className="overflow-x-auto">
@@ -176,13 +248,7 @@ const Reports = () => {
               <tbody>
                 {dailySales.map((day, index) => (
                   <tr key={index} className="border-b hover:bg-gray-50">
-                    <td className="py-2">
-                      {new Date(day.date).toLocaleDateString('pt-BR', { 
-                        weekday: 'short', 
-                        day: '2-digit', 
-                        month: '2-digit' 
-                      })}
-                    </td>
+                    <td className="py-2">{day.displayDate}</td>
                     <td className="py-2 font-medium">{day.quantity} unidades</td>
                     <td className="py-2 font-semibold text-green-600">R$ {day.revenue.toFixed(2)}</td>
                   </tr>
