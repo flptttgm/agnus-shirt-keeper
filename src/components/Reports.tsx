@@ -276,6 +276,8 @@ const Reports = () => {
                   <TableHead>Quantidade</TableHead>
                   <TableHead>Preço Unitário</TableHead>
                   <TableHead>Total</TableHead>
+                  <TableHead>Royalty %</TableHead>
+                  <TableHead>Valor Royalty</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
@@ -300,6 +302,14 @@ const Reports = () => {
                     <TableCell>R$ {sale.unitPrice.toFixed(2)}</TableCell>
                     <TableCell className="font-semibold text-green-600">
                       R$ {sale.totalPrice.toFixed(2)}
+                    </TableCell>
+                    <TableCell>
+                      <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-purple-100 text-purple-600">
+                        {sale.royaltyPercent || 0}%
+                      </span>
+                    </TableCell>
+                    <TableCell className="font-semibold text-purple-600">
+                      R$ {(sale.royaltyAmount || 0).toFixed(2)}
                     </TableCell>
                   </TableRow>
                 ))}
