@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { useStore } from '@/context/StoreContext';
 import { SizeType } from '@/types';
@@ -8,6 +7,7 @@ import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { useToast } from '@/hooks/use-toast';
+import { Percent } from 'lucide-react';
 
 const SalesManagement = () => {
   const { products, sales, addSale } = useStore();
@@ -17,10 +17,17 @@ const SalesManagement = () => {
     size: '' as SizeType,
     quantity: '',
     unitPrice: '',
+    discountPercent: '',
   });
 
   const selectedProduct = products.find(p => p.id === saleData.productId);
   const availableStock = selectedProduct ? selectedProduct.sizes[saleData.size as SizeType] || 0 : 0;
+  
+  // Cálculo do preço com desconto
+  const originalPrice = selectedProduct?.price || 0;
+  const discountPercent = parseFloat(saleData.discountPercent || '0');
+  const discountAmount = originalPrice * (discountPercent / 100);
+  const finalPrice = originalPrice - discountAmount;
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -55,6 +62,15 @@ const SalesManagement = () => {
       return;
     }
 
+    if (discountPercent < 0 || discountPercent > 100) {
+      toast({
+        title: "Erro",
+        description: "O desconto deve estar entre 0% e 100%",
+        variant: "destructive",
+      });
+      return;
+    }
+
     const sale = {
       productId: saleData.productId,
       productName: selectedProduct!.name,
@@ -67,13 +83,19 @@ const SalesManagement = () => {
     addSale(sale);
     
     const originalPrice = selectedProduct!.price;
-    const isCustomPrice = unitPrice !== originalPrice;
+    const hasDiscount = discountPercent > 0;
+    const isCustomPrice = unitPrice !== originalPrice && unitPrice !== finalPrice;
+    
+    let successMessage = "Venda registrada com sucesso!";
+    if (hasDiscount) {
+      successMessage = `Venda registrada com ${discountPercent}% de desconto! (Preço original: R$ ${originalPrice.toFixed(2)})`;
+    } else if (isCustomPrice) {
+      successMessage = `Venda registrada com preço personalizado! (Preço original: R$ ${originalPrice.toFixed(2)})`;
+    }
     
     toast({
       title: "Sucesso",
-      description: isCustomPrice 
-        ? `Venda registrada com preço personalizado! (Preço original: R$ ${originalPrice.toFixed(2)})`
-        : "Venda registrada com sucesso!",
+      description: successMessage,
     });
 
     setSaleData({
@@ -81,6 +103,7 @@ const SalesManagement = () => {
       size: '' as SizeType,
       quantity: '',
       unitPrice: '',
+      discountPercent: '',
     });
   };
 
@@ -91,6 +114,15 @@ const SalesManagement = () => {
       productId,
       unitPrice: product ? product.price.toString() : '',
       size: '' as SizeType,
+      discountPercent: '',
+    }));
+  };
+
+  const handleDiscountChange = (discount: string) => {
+    setSaleData(prev => ({
+      ...prev,
+      discountPercent: discount,
+      unitPrice: selectedProduct && discount ? finalPrice.toFixed(2) : (selectedProduct?.price.toString() || ''),
     }));
   };
 
@@ -100,7 +132,7 @@ const SalesManagement = () => {
         <CardHeader>
           <CardTitle>Registrar Venda</CardTitle>
           <CardDescription>
-            Selecione o produto, tamanho e registre a venda. Você pode alterar o preço se necessário.
+            Selecione o produto, tamanho e registre a venda. Você pode aplicar desconto percentual ou alterar o preço manualmente.
           </CardDescription>
         </CardHeader>
         <CardContent>
@@ -143,7 +175,7 @@ const SalesManagement = () => {
               </div>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
               <div>
                 <Label htmlFor="quantity">Quantidade</Label>
                 <Input
@@ -163,6 +195,29 @@ const SalesManagement = () => {
               </div>
 
               <div>
+                <Label htmlFor="discount">Desconto (%)</Label>
+                <div className="relative">
+                  <Input
+                    id="discount"
+                    type="number"
+                    min="0"
+                    max="100"
+                    step="0.1"
+                    value={saleData.discountPercent}
+                    onChange={(e) => handleDiscountChange(e.target.value)}
+                    placeholder="0"
+                    disabled={!selectedProduct}
+                  />
+                  <Percent className="absolute right-3 top-3 h-4 w-4 text-gray-400" />
+                </div>
+                {selectedProduct && discountPercent > 0 && (
+                  <p className="text-sm text-green-600 mt-1">
+                    Economia: R$ {discountAmount.toFixed(2)}
+                  </p>
+                )}
+              </div>
+
+              <div>
                 <Label htmlFor="unitPrice">Preço Unitário (R$)</Label>
                 <Input
                   id="unitPrice"
@@ -173,9 +228,14 @@ const SalesManagement = () => {
                   onChange={(e) => setSaleData(prev => ({ ...prev, unitPrice: e.target.value }))}
                   placeholder="0.00"
                 />
-                {selectedProduct && saleData.unitPrice && parseFloat(saleData.unitPrice) !== selectedProduct.price && (
+                {selectedProduct && saleData.unitPrice && parseFloat(saleData.unitPrice) !== selectedProduct.price && parseFloat(saleData.unitPrice) !== finalPrice && (
                   <p className="text-sm text-amber-600 mt-1">
-                    ⚠️ Preço diferente do cadastrado (R$ {selectedProduct.price.toFixed(2)})
+                    ⚠️ Preço personalizado (Original: R$ {selectedProduct.price.toFixed(2)})
+                  </p>
+                )}
+                {selectedProduct && discountPercent > 0 && parseFloat(saleData.unitPrice) === finalPrice && (
+                  <p className="text-sm text-blue-600 mt-1">
+                    💰 Com desconto aplicado
                   </p>
                 )}
               </div>
@@ -186,6 +246,11 @@ const SalesManagement = () => {
                   <span className="text-lg font-bold text-green-700">
                     R$ {(parseInt(saleData.quantity || '0') * parseFloat(saleData.unitPrice || '0')).toFixed(2)}
                   </span>
+                  {discountPercent > 0 && (
+                    <div className="text-xs text-gray-600 mt-1">
+                      Sem desconto: R$ {(parseInt(saleData.quantity || '0') * originalPrice).toFixed(2)}
+                    </div>
+                  )}
                 </div>
               </div>
             </div>
