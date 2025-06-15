@@ -1,8 +1,9 @@
 
 import React, { useState } from 'react';
 import { StoreProvider } from '@/context/StoreContext';
+import { SidebarProvider, SidebarTrigger } from '@/components/ui/sidebar';
+import { AppSidebar } from '@/components/AppSidebar';
 import Header from '@/components/Header';
-import Navigation from '@/components/Navigation';
 import Dashboard from '@/components/Dashboard';
 import ProductManagement from '@/components/ProductManagement';
 import SalesManagement from '@/components/SalesManagement';
@@ -28,13 +29,26 @@ const Index = () => {
 
   return (
     <StoreProvider>
-      <div className="min-h-screen bg-gray-50">
-        <Header />
-        <Navigation activeTab={activeTab} setActiveTab={setActiveTab} />
-        <main className="container mx-auto max-w-7xl">
-          {renderContent()}
-        </main>
-      </div>
+      <SidebarProvider>
+        <div className="min-h-screen flex w-full bg-gray-50">
+          <AppSidebar activeTab={activeTab} setActiveTab={setActiveTab} />
+          <div className="flex-1 flex flex-col">
+            <Header />
+            <div className="flex items-center px-4 py-3 border-b bg-white">
+              <SidebarTrigger />
+              <h1 className="ml-4 text-lg font-semibold text-gray-900">
+                {activeTab === 'dashboard' && 'Dashboard'}
+                {activeTab === 'products' && 'Produtos'}
+                {activeTab === 'sales' && 'Vendas'}
+                {activeTab === 'reports' && 'Relatórios'}
+              </h1>
+            </div>
+            <main className="flex-1 container mx-auto max-w-7xl">
+              {renderContent()}
+            </main>
+          </div>
+        </div>
+      </SidebarProvider>
     </StoreProvider>
   );
 };
