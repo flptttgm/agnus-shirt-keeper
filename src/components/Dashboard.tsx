@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { useStore } from '@/context/StoreContext';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -12,7 +11,8 @@ import {
   AlertTriangle,
   BarChart3,
   Shirt,
-  Image
+  Image,
+  BadgePercent
 } from 'lucide-react';
 
 const Dashboard = () => {
@@ -24,6 +24,11 @@ const Dashboard = () => {
   }, 0);
   const totalSales = sales.length;
   const totalRevenue = sales.reduce((total, sale) => total + sale.totalPrice, 0);
+  
+  // Cálculo dos royalties acumulados
+  const totalRoyalties = sales.reduce((total, sale) => {
+    return total + (sale.royaltyAmount || 0);
+  }, 0);
 
   const lowStockProducts = products.filter(product => {
     const totalProductStock = Object.values(product.sizes).reduce((sum, qty) => sum + qty, 0);
@@ -71,7 +76,7 @@ const Dashboard = () => {
       </div>
 
       {/* Métricas Principais */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-6">
         <Card className="relative overflow-hidden border-0 shadow-lg bg-gradient-to-br from-blue-500 to-blue-600 text-white">
           <CardHeader className="flex flex-row items-center justify-between pb-2">
             <CardTitle className="text-sm font-medium text-blue-100">
@@ -133,6 +138,22 @@ const Dashboard = () => {
           </CardContent>
           <div className="absolute -right-4 -bottom-4 opacity-20">
             <DollarSign className="h-24 w-24" />
+          </div>
+        </Card>
+
+        <Card className="relative overflow-hidden border-0 shadow-lg bg-gradient-to-br from-indigo-500 to-indigo-600 text-white">
+          <CardHeader className="flex flex-row items-center justify-between pb-2">
+            <CardTitle className="text-sm font-medium text-indigo-100">
+              Royalties Acumulados
+            </CardTitle>
+            <BadgePercent className="h-6 w-6 text-indigo-200" />
+          </CardHeader>
+          <CardContent>
+            <div className="text-3xl font-bold">R$ {totalRoyalties.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</div>
+            <p className="text-xs text-indigo-100 mt-1">valor total em royalties</p>
+          </CardContent>
+          <div className="absolute -right-4 -bottom-4 opacity-20">
+            <BadgePercent className="h-24 w-24" />
           </div>
         </Card>
       </div>

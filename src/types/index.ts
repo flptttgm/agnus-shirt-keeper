@@ -23,6 +23,8 @@ export interface Sale {
   quantity: number;
   unitPrice: number;
   totalPrice: number;
+  royaltyPercent?: number;
+  royaltyAmount?: number;
   createdAt: Date;
 }
 
