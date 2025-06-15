@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { useStore } from '@/context/StoreContext';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -10,7 +11,8 @@ import {
   DollarSign, 
   AlertTriangle,
   BarChart3,
-  Shirt
+  Shirt,
+  Image
 } from 'lucide-react';
 
 const Dashboard = () => {
@@ -234,6 +236,26 @@ const Dashboard = () => {
                 
                 return (
                   <div key={product.id} className="border rounded-lg p-4 hover:shadow-md transition-all bg-white">
+                    {/* Imagem do Produto */}
+                    <div className="mb-4 relative">
+                      {product.image ? (
+                        <div className="w-full h-40 rounded-lg overflow-hidden bg-gray-100">
+                          <img 
+                            src={product.image} 
+                            alt={product.name}
+                            className="w-full h-full object-cover transition-transform hover:scale-105"
+                          />
+                        </div>
+                      ) : (
+                        <div className="w-full h-40 bg-gray-100 rounded-lg flex items-center justify-center">
+                          <div className="text-center text-gray-400">
+                            <Image className="h-12 w-12 mx-auto mb-2" />
+                            <p className="text-sm">Sem imagem</p>
+                          </div>
+                        </div>
+                      )}
+                    </div>
+
                     <div className="mb-4">
                       <h3 className="font-semibold text-lg text-gray-800 mb-1">{product.name}</h3>
                       <div className="flex justify-between items-center">
