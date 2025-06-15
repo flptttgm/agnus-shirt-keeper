@@ -8,16 +8,15 @@ const Header = () => {
         <div className="flex items-center justify-between">
           <div className="flex items-center space-x-4">
             <div className="w-12 h-12 bg-white rounded-full flex items-center justify-center">
-              <span className="text-2xl font-bold text-blue-600">A</span>
+              <span className="text-2xl font-bold text-blue-600">B</span>
             </div>
             <div>
-              <h1 className="text-3xl font-bold">Agnus</h1>
+              <h1 className="text-3xl font-bold">Badboy</h1>
               <p className="text-blue-100">Sistema de Gestão de Estoque</p>
             </div>
           </div>
           <div className="text-right">
             <p className="text-sm text-blue-100">Gestão Inteligente</p>
-            <p className="text-lg font-semibold">Camisetas Premium</p>
           </div>
         </div>
       </div>
