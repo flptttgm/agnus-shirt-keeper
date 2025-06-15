@@ -1,7 +1,7 @@
-
 import React from 'react';
 import { useStore } from '@/context/StoreContext';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 
 const Reports = () => {
   const { products, sales } = useStore();
@@ -57,6 +57,10 @@ const Reports = () => {
       revenue: daysSales.reduce((sum, sale) => sum + sale.totalPrice, 0),
     };
   });
+
+  // Vendas ordenadas por data (da mais recente para a mais antiga)
+  const salesByDate = [...sales]
+    .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
 
   return (
     <div className="p-6 space-y-6">
@@ -186,6 +190,60 @@ const Reports = () => {
               </tbody>
             </table>
           </div>
+        </CardContent>
+      </Card>
+
+      {/* Lista Completa de Vendas por Data */}
+      <Card>
+        <CardHeader>
+          <CardTitle>Histórico Completo de Vendas</CardTitle>
+          <CardDescription>Todas as vendas ordenadas da mais recente para a mais antiga</CardDescription>
+        </CardHeader>
+        <CardContent>
+          {salesByDate.length > 0 ? (
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  <TableHead>Data e Hora</TableHead>
+                  <TableHead>Produto</TableHead>
+                  <TableHead>Tamanho</TableHead>
+                  <TableHead>Quantidade</TableHead>
+                  <TableHead>Preço Unitário</TableHead>
+                  <TableHead>Total</TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {salesByDate.map((sale) => (
+                  <TableRow key={sale.id}>
+                    <TableCell>
+                      {new Date(sale.createdAt).toLocaleString('pt-BR', {
+                        day: '2-digit',
+                        month: '2-digit',
+                        year: 'numeric',
+                        hour: '2-digit',
+                        minute: '2-digit'
+                      })}
+                    </TableCell>
+                    <TableCell className="font-medium">{sale.productName}</TableCell>
+                    <TableCell>
+                      <span className="inline-flex items-center justify-center w-6 h-6 bg-blue-100 text-blue-600 rounded-full text-sm font-medium">
+                        {sale.size}
+                      </span>
+                    </TableCell>
+                    <TableCell>{sale.quantity}</TableCell>
+                    <TableCell>R$ {sale.unitPrice.toFixed(2)}</TableCell>
+                    <TableCell className="font-semibold text-green-600">
+                      R$ {sale.totalPrice.toFixed(2)}
+                    </TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          ) : (
+            <div className="text-center py-8">
+              <p className="text-gray-500">Nenhuma venda registrada ainda</p>
+            </div>
+          )}
         </CardContent>
       </Card>
     </div>
