@@ -46,6 +46,15 @@ const SalesManagement = () => {
       return;
     }
 
+    if (unitPrice <= 0) {
+      toast({
+        title: "Erro",
+        description: "O preço unitário deve ser maior que zero",
+        variant: "destructive",
+      });
+      return;
+    }
+
     const sale = {
       productId: saleData.productId,
       productName: selectedProduct!.name,
@@ -57,9 +66,14 @@ const SalesManagement = () => {
 
     addSale(sale);
     
+    const originalPrice = selectedProduct!.price;
+    const isCustomPrice = unitPrice !== originalPrice;
+    
     toast({
       title: "Sucesso",
-      description: "Venda registrada com sucesso!",
+      description: isCustomPrice 
+        ? `Venda registrada com preço personalizado! (Preço original: R$ ${originalPrice.toFixed(2)})`
+        : "Venda registrada com sucesso!",
     });
 
     setSaleData({
@@ -86,7 +100,7 @@ const SalesManagement = () => {
         <CardHeader>
           <CardTitle>Registrar Venda</CardTitle>
           <CardDescription>
-            Selecione o produto, tamanho e registre a venda
+            Selecione o produto, tamanho e registre a venda. Você pode alterar o preço se necessário.
           </CardDescription>
         </CardHeader>
         <CardContent>
@@ -154,10 +168,16 @@ const SalesManagement = () => {
                   id="unitPrice"
                   type="number"
                   step="0.01"
+                  min="0.01"
                   value={saleData.unitPrice}
                   onChange={(e) => setSaleData(prev => ({ ...prev, unitPrice: e.target.value }))}
                   placeholder="0.00"
                 />
+                {selectedProduct && saleData.unitPrice && parseFloat(saleData.unitPrice) !== selectedProduct.price && (
+                  <p className="text-sm text-amber-600 mt-1">
+                    ⚠️ Preço diferente do cadastrado (R$ {selectedProduct.price.toFixed(2)})
+                  </p>
+                )}
               </div>
 
               <div>
