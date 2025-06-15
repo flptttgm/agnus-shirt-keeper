@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { useStore } from '@/context/StoreContext';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -10,7 +9,8 @@ import {
   TrendingUp, 
   DollarSign, 
   AlertTriangle,
-  BarChart3
+  BarChart3,
+  Shirt
 } from 'lucide-react';
 
 const Dashboard = () => {
@@ -215,6 +215,102 @@ const Dashboard = () => {
           </CardContent>
         </Card>
       </div>
+
+      {/* Nova seção: Produtos e Disponibilidade */}
+      <Card className="shadow-lg border-0">
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <Shirt className="h-5 w-5 text-blue-600" />
+            Produtos e Disponibilidade de Tamanhos
+          </CardTitle>
+          <CardDescription>Visualize todos os produtos e seus estoques por tamanho</CardDescription>
+        </CardHeader>
+        <CardContent>
+          {products.length > 0 ? (
+            <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
+              {products.map((product) => {
+                const totalStock = Object.values(product.sizes).reduce((sum, qty) => sum + qty, 0);
+                const maxStock = Math.max(...Object.values(product.sizes));
+                
+                return (
+                  <div key={product.id} className="border rounded-lg p-4 hover:shadow-md transition-all bg-white">
+                    <div className="mb-4">
+                      <h3 className="font-semibold text-lg text-gray-800 mb-1">{product.name}</h3>
+                      <div className="flex justify-between items-center">
+                        <p className="text-green-600 font-bold">R$ {product.price.toFixed(2)}</p>
+                        <div className="flex items-center gap-2">
+                          <Badge 
+                            variant={totalStock > 10 ? "default" : totalStock > 0 ? "secondary" : "destructive"}
+                            className="text-xs"
+                          >
+                            {totalStock} total
+                          </Badge>
+                        </div>
+                      </div>
+                    </div>
+
+                    <div className="space-y-3">
+                      <h4 className="text-sm font-medium text-gray-600 mb-2">Disponibilidade por Tamanho:</h4>
+                      {Object.entries(product.sizes).map(([size, quantity]) => {
+                        const percentage = maxStock > 0 ? (quantity / maxStock) * 100 : 0;
+                        const stockLevel = quantity === 0 ? 'out' : quantity < 5 ? 'low' : 'good';
+                        
+                        return (
+                          <div key={size} className="space-y-1">
+                            <div className="flex justify-between items-center">
+                              <div className="flex items-center gap-2">
+                                <div className={`w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold ${
+                                  stockLevel === 'out' ? 'bg-red-100 text-red-600' :
+                                  stockLevel === 'low' ? 'bg-yellow-100 text-yellow-600' :
+                                  'bg-green-100 text-green-600'
+                                }`}>
+                                  {size}
+                                </div>
+                                <span className="text-sm font-medium">{quantity} unidades</span>
+                              </div>
+                              <Badge 
+                                variant="outline" 
+                                className={`text-xs ${
+                                  stockLevel === 'out' ? 'border-red-200 text-red-600 bg-red-50' :
+                                  stockLevel === 'low' ? 'border-yellow-200 text-yellow-600 bg-yellow-50' :
+                                  'border-green-200 text-green-600 bg-green-50'
+                                }`}
+                              >
+                                {stockLevel === 'out' ? 'Esgotado' : 
+                                 stockLevel === 'low' ? 'Baixo' : 'Disponível'}
+                              </Badge>
+                            </div>
+                            <Progress 
+                              value={percentage} 
+                              className={`h-2 ${
+                                stockLevel === 'out' ? '[&>div]:bg-red-500' :
+                                stockLevel === 'low' ? '[&>div]:bg-yellow-500' :
+                                '[&>div]:bg-green-500'
+                              }`}
+                            />
+                          </div>
+                        );
+                      })}
+                    </div>
+
+                    {product.description && (
+                      <div className="mt-3 pt-3 border-t border-gray-100">
+                        <p className="text-xs text-gray-500">{product.description}</p>
+                      </div>
+                    )}
+                  </div>
+                );
+              })}
+            </div>
+          ) : (
+            <div className="text-center py-12 text-gray-500">
+              <Shirt className="h-16 w-16 mx-auto mb-4 text-gray-300" />
+              <h3 className="text-lg font-medium mb-2">Nenhum produto cadastrado</h3>
+              <p className="text-sm">Cadastre seus produtos para visualizar o estoque aqui</p>
+            </div>
+          )}
+        </CardContent>
+      </Card>
 
       {/* Alertas de Estoque */}
       {(lowStockProducts.length > 0 || outOfStockProducts.length > 0) && (
