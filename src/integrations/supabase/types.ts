@@ -14,7 +14,101 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      products: {
+        Row: {
+          created_at: string
+          description: string | null
+          id: string
+          image: string | null
+          name: string
+          price: number
+          size_g: number
+          size_gg: number
+          size_m: number
+          size_p: number
+          size_xg: number
+          size_xgg: number
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          description?: string | null
+          id?: string
+          image?: string | null
+          name: string
+          price: number
+          size_g?: number
+          size_gg?: number
+          size_m?: number
+          size_p?: number
+          size_xg?: number
+          size_xgg?: number
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          description?: string | null
+          id?: string
+          image?: string | null
+          name?: string
+          price?: number
+          size_g?: number
+          size_gg?: number
+          size_m?: number
+          size_p?: number
+          size_xg?: number
+          size_xgg?: number
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      sales: {
+        Row: {
+          created_at: string
+          id: string
+          product_id: string
+          product_name: string
+          quantity: number
+          royalty_amount: number | null
+          royalty_percent: number | null
+          size: string
+          total_price: number
+          unit_price: number
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          product_id: string
+          product_name: string
+          quantity: number
+          royalty_amount?: number | null
+          royalty_percent?: number | null
+          size: string
+          total_price: number
+          unit_price: number
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          product_id?: string
+          product_name?: string
+          quantity?: number
+          royalty_amount?: number | null
+          royalty_percent?: number | null
+          size?: string
+          total_price?: number
+          unit_price?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "sales_product_id_fkey"
+            columns: ["product_id"]
+            isOneToOne: false
+            referencedRelation: "products"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
     }
     Views: {
       [_ in never]: never

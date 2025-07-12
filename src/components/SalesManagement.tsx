@@ -12,7 +12,7 @@ import { useToast } from '@/hooks/use-toast';
 import { Percent, BadgePercent } from 'lucide-react';
 
 const SalesManagement = () => {
-  const { products, sales, addSale } = useStore();
+  const { products, sales, loading, addSale } = useStore();
   const { toast } = useToast();
   const [saleData, setSaleData] = useState({
     productId: '',
@@ -39,7 +39,7 @@ const SalesManagement = () => {
   const totalSaleValue = quantity * unitPrice;
   const royaltyAmount = totalSaleValue * (royaltyPercent / 100);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
     if (!saleData.productId || !saleData.size || !saleData.quantity || !saleData.unitPrice) {
@@ -92,37 +92,21 @@ const SalesManagement = () => {
       royaltyAmount: royaltyAmount > 0 ? royaltyAmount : undefined,
     };
 
-    addSale(sale);
-    
-    const originalPrice = selectedProduct!.price;
-    const hasDiscount = discountPercent > 0;
-    const hasRoyalty = royaltyPercent > 0;
-    const isCustomPrice = unitPrice !== originalPrice && unitPrice !== finalPrice;
-    
-    let successMessage = "Venda registrada com sucesso!";
-    if (hasDiscount && hasRoyalty) {
-      successMessage = `Venda registrada com ${discountPercent}% de desconto e ${royaltyPercent}% de royalties! (Royalties: R$ ${royaltyAmount.toFixed(2)})`;
-    } else if (hasDiscount) {
-      successMessage = `Venda registrada com ${discountPercent}% de desconto! (Preço original: R$ ${originalPrice.toFixed(2)})`;
-    } else if (hasRoyalty) {
-      successMessage = `Venda registrada com ${royaltyPercent}% de royalties! (Royalties: R$ ${royaltyAmount.toFixed(2)})`;
-    } else if (isCustomPrice) {
-      successMessage = `Venda registrada com preço personalizado! (Preço original: R$ ${originalPrice.toFixed(2)})`;
+    try {
+      await addSale(sale);
+      
+      // Reset form after successful sale
+      setSaleData({
+        productId: '',
+        size: '' as SizeType,
+        quantity: '',
+        unitPrice: '',
+        discountPercent: '',
+        royaltyPercent: '0',
+      });
+    } catch (error) {
+      // Error handling is done in the hooks
     }
-    
-    toast({
-      title: "Sucesso",
-      description: successMessage,
-    });
-
-    setSaleData({
-      productId: '',
-      size: '' as SizeType,
-      quantity: '',
-      unitPrice: '',
-      discountPercent: '',
-      royaltyPercent: '0',
-    });
   };
 
   const handleProductChange = (productId: string) => {

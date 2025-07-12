@@ -1,15 +1,19 @@
-
-import React, { createContext, useContext, useState, ReactNode } from 'react';
+import React, { createContext, useContext, ReactNode } from 'react';
 import { Product, Sale } from '@/types';
+import { useProducts } from '@/hooks/useProducts';
+import { useSales } from '@/hooks/useSales';
 
 interface StoreContextType {
   products: Product[];
   sales: Sale[];
-  addProduct: (product: Omit<Product, 'id' | 'createdAt'>) => void;
-  updateProduct: (id: string, product: Partial<Product>) => void;
-  deleteProduct: (id: string) => void;
-  addSale: (sale: Omit<Sale, 'id' | 'createdAt'>) => void;
-  updateProductStock: (productId: string, size: keyof Product['sizes'], quantity: number) => void;
+  loading: boolean;
+  addProduct: (product: Omit<Product, 'id' | 'createdAt'>) => Promise<void>;
+  updateProduct: (id: string, product: Partial<Product>) => Promise<void>;
+  deleteProduct: (id: string) => Promise<void>;
+  addSale: (sale: Omit<Sale, 'id' | 'createdAt'>) => Promise<void>;
+  updateProductStock: (productId: string, size: keyof Product['sizes'], quantity: number) => Promise<void>;
+  refreshProducts: () => Promise<void>;
+  refreshSales: () => Promise<void>;
 }
 
 const StoreContext = createContext<StoreContextType | undefined>(undefined);
@@ -23,64 +27,49 @@ export const useStore = () => {
 };
 
 export const StoreProvider = ({ children }: { children: ReactNode }) => {
-  const [products, setProducts] = useState<Product[]>([]);
-  const [sales, setSales] = useState<Sale[]>([]);
+  const {
+    products,
+    loading: productsLoading,
+    addProduct,
+    updateProduct,
+    deleteProduct,
+    updateProductStock,
+    refreshProducts,
+  } = useProducts();
 
-  const addProduct = (productData: Omit<Product, 'id' | 'createdAt'>) => {
-    const newProduct: Product = {
-      ...productData,
-      id: Date.now().toString(),
-      createdAt: new Date(),
-    };
-    setProducts(prev => [...prev, newProduct]);
-  };
+  const {
+    sales,
+    loading: salesLoading,
+    addSale: addSaleToDb,
+    refreshSales,
+  } = useSales();
 
-  const updateProduct = (id: string, productData: Partial<Product>) => {
-    setProducts(prev => prev.map(product => 
-      product.id === id ? { ...product, ...productData } : product
-    ));
-  };
-
-  const deleteProduct = (id: string) => {
-    setProducts(prev => prev.filter(product => product.id !== id));
-  };
-
-  const addSale = (saleData: Omit<Sale, 'id' | 'createdAt'>) => {
-    const newSale: Sale = {
-      ...saleData,
-      id: Date.now().toString(),
-      createdAt: new Date(),
-    };
-    setSales(prev => [...prev, newSale]);
+  const addSale = async (saleData: Omit<Sale, 'id' | 'createdAt'>) => {
+    // Add the sale to database
+    await addSaleToDb(saleData);
     
-    // Atualizar estoque
-    updateProductStock(saleData.productId, saleData.size, -saleData.quantity);
+    // Update product stock
+    await updateProductStock(saleData.productId, saleData.size, -saleData.quantity);
+    
+    // Refresh data
+    await refreshProducts();
+    await refreshSales();
   };
 
-  const updateProductStock = (productId: string, size: keyof Product['sizes'], quantity: number) => {
-    setProducts(prev => prev.map(product => {
-      if (product.id === productId) {
-        return {
-          ...product,
-          sizes: {
-            ...product.sizes,
-            [size]: Math.max(0, product.sizes[size] + quantity)
-          }
-        };
-      }
-      return product;
-    }));
-  };
+  const loading = productsLoading || salesLoading;
 
   return (
     <StoreContext.Provider value={{
       products,
       sales,
+      loading,
       addProduct,
       updateProduct,
       deleteProduct,
       addSale,
       updateProductStock,
+      refreshProducts,
+      refreshSales,
     }}>
       {children}
     </StoreContext.Provider>

@@ -11,7 +11,7 @@ import { useToast } from '@/hooks/use-toast';
 import ImageUpload from './ImageUpload';
 
 const ProductManagement = () => {
-  const { products, addProduct, updateProduct, deleteProduct } = useStore();
+  const { products, loading, addProduct, updateProduct, deleteProduct } = useStore();
   const { toast } = useToast();
   const [isEditing, setIsEditing] = useState<string | null>(null);
   const [formData, setFormData] = useState({
@@ -33,7 +33,7 @@ const ProductManagement = () => {
     setIsEditing(null);
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
     if (!formData.name || !formData.price) {
@@ -60,21 +60,16 @@ const ProductManagement = () => {
       }
     };
 
-    if (isEditing) {
-      updateProduct(isEditing, productData);
-      toast({
-        title: "Sucesso",
-        description: "Produto atualizado com sucesso!",
-      });
-    } else {
-      addProduct(productData);
-      toast({
-        title: "Sucesso",
-        description: "Produto adicionado com sucesso!",
-      });
+    try {
+      if (isEditing) {
+        await updateProduct(isEditing, productData);
+      } else {
+        await addProduct(productData);
+      }
+      resetForm();
+    } catch (error) {
+      // Error handling is done in the hooks
     }
-
-    resetForm();
   };
 
   const handleEdit = (product: Product) => {
@@ -95,13 +90,13 @@ const ProductManagement = () => {
     setIsEditing(product.id);
   };
 
-  const handleDelete = (id: string) => {
+  const handleDelete = async (id: string) => {
     if (window.confirm('Tem certeza que deseja excluir este produto?')) {
-      deleteProduct(id);
-      toast({
-        title: "Sucesso",
-        description: "Produto excluído com sucesso!",
-      });
+      try {
+        await deleteProduct(id);
+      } catch (error) {
+        // Error handling is done in the hooks
+      }
     }
   };
 
@@ -194,7 +189,13 @@ const ProductManagement = () => {
         </CardContent>
       </Card>
 
-      {products.length > 0 && (
+      {loading ? (
+        <Card>
+          <CardContent className="py-8 text-center">
+            <p>Carregando produtos...</p>
+          </CardContent>
+        </Card>
+      ) : products.length > 0 ? (
         <Card>
           <CardHeader>
             <CardTitle>Produtos Cadastrados</CardTitle>
@@ -260,7 +261,7 @@ const ProductManagement = () => {
             </div>
           </CardContent>
         </Card>
-      )}
+      ) : null}
     </div>
   );
 };
