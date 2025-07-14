@@ -1,7 +1,18 @@
 
 import React from 'react';
+import { LogOut } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { useAuth } from '@/context/AuthContext';
+import { useNavigate } from 'react-router-dom';
 
 const Header = () => {
+  const { signOut, user } = useAuth();
+  const navigate = useNavigate();
+
+  const handleLogout = async () => {
+    await signOut();
+    navigate('/auth');
+  };
   return (
     <header className="bg-gradient-to-r from-brand-dark to-brand-red text-white shadow-lg">
       <div className="container mx-auto px-4 py-6">
@@ -19,9 +30,20 @@ const Header = () => {
               <p className="text-gray-200">Sistema de Gestão de Estoque</p>
             </div>
           </div>
-          <div className="text-right">
-            <p className="text-lg font-semibold">Michele</p>
-            <p className="text-sm text-gray-200">Gestão Inteligente</p>
+          <div className="flex items-center space-x-4">
+            <div className="text-right">
+              <p className="text-lg font-semibold">{user?.email}</p>
+              <p className="text-sm text-gray-200">Usuário Autenticado</p>
+            </div>
+            <Button 
+              variant="outline" 
+              size="sm" 
+              onClick={handleLogout}
+              className="border-white/20 text-white hover:bg-white/10"
+            >
+              <LogOut className="h-4 w-4 mr-2" />
+              Sair
+            </Button>
           </div>
         </div>
       </div>
