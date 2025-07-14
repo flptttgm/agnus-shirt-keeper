@@ -51,6 +51,26 @@
     --sidebar-border: 220 13% 91%;
 
     --sidebar-ring: 217.2 91.2% 59.8%;
+
+    /* Brand colors */
+    --brand-dark: 0 0% 0%;
+    --brand-red: 0 84% 55%;
+    --brand-gradient: linear-gradient(to right, hsl(var(--brand-dark)), hsl(var(--brand-red)));
+    
+    /* Status colors */
+    --success: 142 76% 36%;
+    --success-foreground: 0 0% 98%;
+    --warning: 45 93% 47%;
+    --warning-foreground: 0 0% 98%;
+    --info: 221 83% 53%;
+    --info-foreground: 0 0% 98%;
+    
+    /* Custom gradients */
+    --gradient-blue: linear-gradient(135deg, hsl(221 83% 53%), hsl(221 83% 63%));
+    --gradient-green: linear-gradient(135deg, hsl(142 76% 36%), hsl(142 76% 46%));
+    --gradient-purple: linear-gradient(135deg, hsl(262 83% 58%), hsl(262 83% 68%));
+    --gradient-orange: linear-gradient(135deg, hsl(25 95% 53%), hsl(25 95% 63%));
+    --gradient-indigo: linear-gradient(135deg, hsl(239 84% 67%), hsl(239 84% 77%));
   }
 
   .dark {

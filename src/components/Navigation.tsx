@@ -15,7 +15,7 @@ const Navigation = ({ activeTab, setActiveTab }: NavigationProps) => {
   ];
 
   return (
-    <nav className="bg-white shadow-md border-b">
+    <nav className="bg-card shadow-md border-b">
       <div className="container mx-auto px-4">
         <div className="flex space-x-1">
           {tabs.map((tab) => (
@@ -24,8 +24,8 @@ const Navigation = ({ activeTab, setActiveTab }: NavigationProps) => {
               onClick={() => setActiveTab(tab.id)}
               className={`px-6 py-4 text-sm font-medium transition-all duration-200 border-b-2 ${
                 activeTab === tab.id
-                  ? 'text-blue-600 border-blue-600 bg-blue-50'
-                  : 'text-gray-600 border-transparent hover:text-blue-600 hover:border-blue-300'
+                  ? 'text-info border-info bg-info/10'
+                  : 'text-muted-foreground border-transparent hover:text-info hover:border-info/30'
               }`}
             >
               <span className="mr-2">{tab.icon}</span>

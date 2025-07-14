@@ -28,7 +28,7 @@ const Index = () => {
 
   return (
     <StoreProvider>
-      <div className="min-h-screen bg-gray-50">
+      <div className="min-h-screen bg-background">
         <Header />
         <Navigation activeTab={activeTab} setActiveTab={setActiveTab} />
         <main className="container mx-auto max-w-7xl">

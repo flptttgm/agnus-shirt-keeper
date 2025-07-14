@@ -3,7 +3,7 @@ import React from 'react';
 
 const Header = () => {
   return (
-    <header className="bg-gradient-to-r from-black to-red-600 text-white shadow-lg">
+    <header className="bg-gradient-to-r from-brand-dark to-brand-red text-white shadow-lg">
       <div className="container mx-auto px-4 py-6">
         <div className="flex items-center justify-between">
           <div className="flex items-center space-x-4">
