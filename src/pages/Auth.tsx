@@ -7,7 +7,6 @@ import { supabase } from '@/integrations/supabase/client';
 import { useNavigate } from 'react-router-dom';
 
 const Auth = () => {
-  const [isLogin, setIsLogin] = useState(true);
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
@@ -30,36 +29,19 @@ const Auth = () => {
     setLoading(true);
 
     try {
-      if (isLogin) {
-        const { error } = await supabase.auth.signInWithPassword({
-          email,
-          password,
-        });
+      const { error } = await supabase.auth.signInWithPassword({
+        email,
+        password,
+      });
 
-        if (error) throw error;
+      if (error) throw error;
 
-        toast({
-          title: "Login realizado com sucesso!",
-          description: "Redirecionando para o dashboard...",
-        });
-        
-        navigate('/');
-      } else {
-        const { error } = await supabase.auth.signUp({
-          email,
-          password,
-          options: {
-            emailRedirectTo: `${window.location.origin}/`
-          }
-        });
-
-        if (error) throw error;
-
-        toast({
-          title: "Registro realizado com sucesso!",
-          description: "Verifique seu email para confirmar a conta.",
-        });
-      }
+      toast({
+        title: "Login realizado com sucesso!",
+        description: "Redirecionando para o dashboard...",
+      });
+      
+      navigate('/');
     } catch (error: any) {
       toast({
         title: "Erro",
@@ -76,7 +58,7 @@ const Auth = () => {
       <Card className="w-full max-w-md">
         <CardHeader className="text-center">
           <CardTitle className="text-2xl font-bold">
-            {isLogin ? 'Entrar' : 'Criar Conta'}
+            Entrar
           </CardTitle>
         </CardHeader>
         <CardContent>
@@ -104,19 +86,9 @@ const Auth = () => {
               className="w-full"
               disabled={loading}
             >
-              {loading ? 'Processando...' : (isLogin ? 'Entrar' : 'Criar Conta')}
+              {loading ? 'Processando...' : 'Entrar'}
             </Button>
           </form>
-          
-          <div className="mt-4 text-center">
-            <Button
-              variant="ghost"
-              onClick={() => setIsLogin(!isLogin)}
-              className="text-sm"
-            >
-              {isLogin ? 'Não tem uma conta? Criar conta' : 'Já tem uma conta? Entrar'}
-            </Button>
-          </div>
         </CardContent>
       </Card>
     </div>
