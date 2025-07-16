@@ -29,6 +29,8 @@ export const useSales = () => {
         totalPrice: Number(sale.total_price),
         royaltyPercent: sale.royalty_percent ? Number(sale.royalty_percent) : undefined,
         royaltyAmount: sale.royalty_amount ? Number(sale.royalty_amount) : undefined,
+        customerName: sale.customer_name || undefined,
+        customerPhone: sale.customer_phone || undefined,
         createdAt: new Date(sale.created_at),
       }));
 
@@ -59,6 +61,8 @@ export const useSales = () => {
           total_price: saleData.totalPrice,
           royalty_percent: saleData.royaltyPercent,
           royalty_amount: saleData.royaltyAmount,
+          customer_name: saleData.customerName,
+          customer_phone: saleData.customerPhone,
         });
 
       if (error) throw error;

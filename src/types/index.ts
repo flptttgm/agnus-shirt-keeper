@@ -26,6 +26,8 @@ export interface Sale {
   totalPrice: number;
   royaltyPercent?: number;
   royaltyAmount?: number;
+  customerName?: string;
+  customerPhone?: string;
   createdAt: Date;
 }
 

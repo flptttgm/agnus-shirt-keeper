@@ -65,6 +65,8 @@ export type Database = {
       sales: {
         Row: {
           created_at: string
+          customer_name: string | null
+          customer_phone: string | null
           id: string
           product_id: string
           product_name: string
@@ -77,6 +79,8 @@ export type Database = {
         }
         Insert: {
           created_at?: string
+          customer_name?: string | null
+          customer_phone?: string | null
           id?: string
           product_id: string
           product_name: string
@@ -89,6 +93,8 @@ export type Database = {
         }
         Update: {
           created_at?: string
+          customer_name?: string | null
+          customer_phone?: string | null
           id?: string
           product_id?: string
           product_name?: string

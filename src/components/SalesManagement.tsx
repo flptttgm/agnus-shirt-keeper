@@ -21,6 +21,8 @@ const SalesManagement = () => {
     unitPrice: '',
     discountPercent: '',
     royaltyPercent: '0',
+    customerName: '',
+    customerPhone: '',
   });
 
   const selectedProduct = products.find(p => p.id === saleData.productId);
@@ -90,6 +92,8 @@ const SalesManagement = () => {
       totalPrice: quantity * unitPrice,
       royaltyPercent: royaltyPercent > 0 ? royaltyPercent : undefined,
       royaltyAmount: royaltyAmount > 0 ? royaltyAmount : undefined,
+      customerName: saleData.customerName || undefined,
+      customerPhone: saleData.customerPhone || undefined,
     };
 
     try {
@@ -103,6 +107,8 @@ const SalesManagement = () => {
         unitPrice: '',
         discountPercent: '',
         royaltyPercent: '0',
+        customerName: '',
+        customerPhone: '',
       });
     } catch (error) {
       // Error handling is done in the hooks
@@ -139,6 +145,34 @@ const SalesManagement = () => {
         </CardHeader>
         <CardContent>
           <form onSubmit={handleSubmit} className="space-y-4">
+            {/* Dados do Cliente */}
+            <div className="border-b pb-4 mb-4">
+              <Label className="text-base font-semibold mb-3 block">Dados do Cliente</Label>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                  <Label htmlFor="customerName">Nome do Cliente</Label>
+                  <Input
+                    id="customerName"
+                    type="text"
+                    value={saleData.customerName}
+                    onChange={(e) => setSaleData(prev => ({ ...prev, customerName: e.target.value }))}
+                    placeholder="Digite o nome do cliente"
+                  />
+                </div>
+                <div>
+                  <Label htmlFor="customerPhone">Telefone do Cliente</Label>
+                  <Input
+                    id="customerPhone"
+                    type="tel"
+                    value={saleData.customerPhone}
+                    onChange={(e) => setSaleData(prev => ({ ...prev, customerPhone: e.target.value }))}
+                    placeholder="Digite o telefone do cliente"
+                  />
+                </div>
+              </div>
+            </div>
+
+            {/* Dados do Produto */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
                 <Label htmlFor="product">Produto</Label>
@@ -324,6 +358,7 @@ const SalesManagement = () => {
                 <thead>
                   <tr className="border-b">
                     <th className="text-left py-2">Data</th>
+                    <th className="text-left py-2">Cliente</th>
                     <th className="text-left py-2">Produto</th>
                     <th className="text-left py-2">Tamanho</th>
                     <th className="text-left py-2">Qtd</th>
@@ -337,6 +372,14 @@ const SalesManagement = () => {
                     <tr key={sale.id} className="border-b hover:bg-gray-50">
                       <td className="py-2 text-sm">
                         {new Date(sale.createdAt).toLocaleDateString('pt-BR')}
+                      </td>
+                      <td className="py-2">
+                        <div>
+                          <div className="font-medium">{sale.customerName || '-'}</div>
+                          {sale.customerPhone && (
+                            <div className="text-xs text-gray-500">{sale.customerPhone}</div>
+                          )}
+                        </div>
                       </td>
                       <td className="py-2 font-medium">{sale.productName}</td>
                       <td className="py-2">{sale.size}</td>
