@@ -1,7 +1,7 @@
 
 import React, { useState } from 'react';
 import { useStore } from '@/context/StoreContext';
-import { SizeType } from '@/types';
+import { SizeType, Sale } from '@/types';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -9,11 +9,12 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { useToast } from '@/hooks/use-toast';
-import { Percent, BadgePercent } from 'lucide-react';
+import { Percent, BadgePercent, Edit2, X } from 'lucide-react';
 
 const SalesManagement = () => {
-  const { products, sales, loading, addSale } = useStore();
+  const { products, sales, loading, addSale, updateSale } = useStore();
   const { toast } = useToast();
+  const [editingSale, setEditingSale] = useState<Sale | null>(null);
   const [saleData, setSaleData] = useState({
     productId: '',
     size: '' as SizeType,
@@ -97,7 +98,12 @@ const SalesManagement = () => {
     };
 
     try {
-      await addSale(sale);
+      if (editingSale) {
+        await updateSale(editingSale.id, sale);
+        setEditingSale(null);
+      } else {
+        await addSale(sale);
+      }
       
       // Reset form after successful sale
       setSaleData({
@@ -126,21 +132,80 @@ const SalesManagement = () => {
     }));
   };
 
+  const handleEditSale = (sale: Sale) => {
+    setEditingSale(sale);
+    const product = products.find(p => p.id === sale.productId);
+    const originalPrice = product?.price || 0;
+    const discountPercent = originalPrice > 0 ? ((originalPrice - sale.unitPrice) / originalPrice * 100) : 0;
+    
+    setSaleData({
+      productId: sale.productId,
+      size: sale.size,
+      quantity: sale.quantity.toString(),
+      unitPrice: sale.unitPrice.toString(),
+      discountPercent: discountPercent > 0 ? discountPercent.toFixed(1) : '',
+      royaltyPercent: sale.royaltyPercent ? sale.royaltyPercent.toString() : '0',
+      customerName: sale.customerName || '',
+      customerPhone: sale.customerPhone || '',
+    });
+  };
+
+  const handleCancelEdit = () => {
+    setEditingSale(null);
+    setSaleData({
+      productId: '',
+      size: '' as SizeType,
+      quantity: '',
+      unitPrice: '',
+      discountPercent: '',
+      royaltyPercent: '0',
+      customerName: '',
+      customerPhone: '',
+    });
+  };
+
   const handleDiscountChange = (discount: string) => {
-    setSaleData(prev => ({
-      ...prev,
-      discountPercent: discount,
-      unitPrice: selectedProduct && discount ? finalPrice.toFixed(2) : (selectedProduct?.price.toString() || ''),
-    }));
+    const discountValue = parseFloat(discount || '0');
+    if (selectedProduct && discountValue > 0) {
+      const discountAmount = selectedProduct.price * (discountValue / 100);
+      const priceWithDiscount = selectedProduct.price - discountAmount;
+      setSaleData(prev => ({
+        ...prev,
+        discountPercent: discount,
+        unitPrice: priceWithDiscount.toFixed(2),
+      }));
+    } else {
+      setSaleData(prev => ({
+        ...prev,
+        discountPercent: discount,
+        unitPrice: selectedProduct?.price.toString() || prev.unitPrice,
+      }));
+    }
   };
 
   return (
     <div className="p-6 space-y-6">
       <Card>
         <CardHeader>
-          <CardTitle>Registrar Venda</CardTitle>
+          <CardTitle className="flex items-center justify-between">
+            {editingSale ? 'Editar Venda' : 'Registrar Venda'}
+            {editingSale && (
+              <Button 
+                variant="outline" 
+                size="sm" 
+                onClick={handleCancelEdit}
+                className="ml-2"
+              >
+                <X className="h-4 w-4 mr-1" />
+                Cancelar
+              </Button>
+            )}
+          </CardTitle>
           <CardDescription>
-            Selecione o produto, tamanho, aplique descontos e configure royalties para registrar a venda.
+            {editingSale 
+              ? 'Edite os dados da venda selecionada.' 
+              : 'Selecione o produto, tamanho, aplique descontos e configure royalties para registrar a venda.'
+            }
           </CardDescription>
         </CardHeader>
         <CardContent>
@@ -338,7 +403,7 @@ const SalesManagement = () => {
               className="w-full bg-green-600 hover:bg-green-700"
               disabled={!selectedProduct}
             >
-              Registrar Venda
+              {editingSale ? 'Atualizar Venda' : 'Registrar Venda'}
             </Button>
           </form>
         </CardContent>
@@ -365,11 +430,17 @@ const SalesManagement = () => {
                     <th className="text-left py-2">Preço Unit.</th>
                     <th className="text-left py-2">Total</th>
                     <th className="text-left py-2">Royalties</th>
+                    <th className="text-left py-2">Ações</th>
                   </tr>
                 </thead>
                 <tbody>
                   {sales.slice(-10).reverse().map((sale) => (
-                    <tr key={sale.id} className="border-b hover:bg-gray-50">
+                    <tr 
+                      key={sale.id} 
+                      className={`border-b hover:bg-gray-50 transition-colors ${
+                        editingSale?.id === sale.id ? 'bg-blue-50 border-blue-200' : ''
+                      }`}
+                    >
                       <td className="py-2 text-sm">
                         {new Date(sale.createdAt).toLocaleDateString('pt-BR')}
                       </td>
@@ -397,6 +468,17 @@ const SalesManagement = () => {
                         ) : (
                           <span className="text-gray-400 text-sm">-</span>
                         )}
+                      </td>
+                      <td className="py-2">
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={() => handleEditSale(sale)}
+                          className="h-8 w-8 p-0"
+                          disabled={editingSale?.id === sale.id}
+                        >
+                          <Edit2 className="h-3 w-3" />
+                        </Button>
                       </td>
                     </tr>
                   ))}

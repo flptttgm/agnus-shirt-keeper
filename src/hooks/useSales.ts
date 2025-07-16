@@ -83,6 +83,43 @@ export const useSales = () => {
     }
   };
 
+  // Update existing sale
+  const updateSale = async (saleId: string, saleData: Omit<Sale, 'id' | 'createdAt'>) => {
+    try {
+      const { error } = await supabase
+        .from('sales')
+        .update({
+          product_id: saleData.productId,
+          product_name: saleData.productName,
+          size: saleData.size,
+          quantity: saleData.quantity,
+          unit_price: saleData.unitPrice,
+          total_price: saleData.totalPrice,
+          royalty_percent: saleData.royaltyPercent,
+          royalty_amount: saleData.royaltyAmount,
+          customer_name: saleData.customerName,
+          customer_phone: saleData.customerPhone,
+        })
+        .eq('id', saleId);
+
+      if (error) throw error;
+
+      toast({
+        title: "Sucesso",
+        description: "Venda atualizada com sucesso",
+      });
+
+      fetchSales(); // Refresh the list
+    } catch (error) {
+      console.error('Error updating sale:', error);
+      toast({
+        title: "Erro",
+        description: "Falha ao atualizar venda",
+        variant: "destructive",
+      });
+    }
+  };
+
   useEffect(() => {
     fetchSales();
   }, []);
@@ -91,6 +128,7 @@ export const useSales = () => {
     sales,
     loading,
     addSale,
+    updateSale,
     refreshSales: fetchSales,
   };
 };
