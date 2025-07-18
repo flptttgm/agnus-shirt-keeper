@@ -297,7 +297,7 @@ const SalesManagement = () => {
                   id="quantity"
                   type="number"
                   min="1"
-                  max={availableStock}
+                  max={Math.max(1, availableStock)}
                   value={saleData.quantity}
                   onChange={(e) => setSaleData(prev => ({ ...prev, quantity: e.target.value }))}
                   placeholder="Qtd"
