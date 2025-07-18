@@ -27,7 +27,11 @@ const SalesManagement = () => {
   });
 
   const selectedProduct = products.find(p => p.id === saleData.productId);
-  const availableStock = selectedProduct ? selectedProduct.sizes[saleData.size as SizeType] || 0 : 0;
+  // Calcula o estoque disponível considerando se está editando uma venda
+  const currentStock = selectedProduct ? selectedProduct.sizes[saleData.size as SizeType] || 0 : 0;
+  const availableStock = editingSale && editingSale.size === saleData.size && editingSale.productId === saleData.productId 
+    ? currentStock + editingSale.quantity 
+    : currentStock;
   
   // Cálculo do preço com desconto
   const originalPrice = selectedProduct?.price || 0;
