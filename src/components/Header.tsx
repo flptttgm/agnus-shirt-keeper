@@ -36,10 +36,10 @@ const Header = () => {
               <p className="text-sm text-gray-200">Usuário Autenticado</p>
             </div>
             <Button 
-              variant="outline" 
+              variant="secondary" 
               size="sm" 
               onClick={handleLogout}
-              className="border-white/20 text-white hover:bg-white/10"
+              className="bg-white/20 text-white border-white/30 hover:bg-white/30 hover:border-white/50 transition-all duration-200"
             >
               <LogOut className="h-4 w-4 mr-2" />
               Sair
