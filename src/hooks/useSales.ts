@@ -124,11 +124,68 @@ export const useSales = () => {
     fetchSales();
   }, []);
 
+  // Delete sale and restore stock
+  const deleteSale = async (saleId: string) => {
+    try {
+      // First get the sale data to restore stock
+      const { data: saleData, error: fetchError } = await supabase
+        .from('sales')
+        .select('*')
+        .eq('id', saleId)
+        .single();
+
+      if (fetchError) throw fetchError;
+
+      // Delete the sale
+      const { error: deleteError } = await supabase
+        .from('sales')
+        .delete()
+        .eq('id', saleId);
+
+      if (deleteError) throw deleteError;
+
+      // Restore stock by adding back the sold quantity
+      const sizeColumn = `size_${saleData.size.toLowerCase()}`;
+      
+      // Get current product data
+      const { data: productData, error: productError } = await supabase
+        .from('products')
+        .select(sizeColumn as any)
+        .eq('id', saleData.product_id)
+        .single();
+
+      if (productError) throw productError;
+
+      const currentStock = productData[sizeColumn];
+      const { error: updateError } = await supabase
+        .from('products')
+        .update({ [sizeColumn]: currentStock + saleData.quantity })
+        .eq('id', saleData.product_id);
+
+      if (updateError) throw updateError;
+
+      toast({
+        title: "Sucesso",
+        description: "Venda excluída e estoque restaurado com sucesso",
+      });
+
+      fetchSales(); // Refresh the list
+    } catch (error) {
+      console.error('Error deleting sale:', error);
+      toast({
+        title: "Erro",
+        description: "Falha ao excluir venda",
+        variant: "destructive",
+      });
+    }
+  };
+
   return {
     sales,
     loading,
     addSale,
     updateSale,
+    deleteSale,
     refreshSales: fetchSales,
   };
 };

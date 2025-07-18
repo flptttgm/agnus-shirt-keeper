@@ -12,6 +12,7 @@ interface StoreContextType {
   deleteProduct: (id: string) => Promise<void>;
   addSale: (sale: Omit<Sale, 'id' | 'createdAt'>) => Promise<void>;
   updateSale: (saleId: string, sale: Omit<Sale, 'id' | 'createdAt'>) => Promise<void>;
+  deleteSale: (saleId: string) => Promise<void>;
   updateProductStock: (productId: string, size: keyof Product['sizes'], quantity: number) => Promise<void>;
   refreshProducts: () => Promise<void>;
   refreshSales: () => Promise<void>;
@@ -43,6 +44,7 @@ export const StoreProvider = ({ children }: { children: ReactNode }) => {
     loading: salesLoading,
     addSale: addSaleToDb,
     updateSale: updateSaleInDb,
+    deleteSale: deleteSaleFromDb,
     refreshSales,
   } = useSales();
 
@@ -67,6 +69,15 @@ export const StoreProvider = ({ children }: { children: ReactNode }) => {
     await refreshSales();
   };
 
+  const deleteSale = async (saleId: string) => {
+    // Delete the sale from database (this also handles stock restoration)
+    await deleteSaleFromDb(saleId);
+    
+    // Refresh data
+    await refreshProducts();
+    await refreshSales();
+  };
+
   const loading = productsLoading || salesLoading;
 
   return (
@@ -79,6 +90,7 @@ export const StoreProvider = ({ children }: { children: ReactNode }) => {
       deleteProduct,
       addSale,
       updateSale,
+      deleteSale,
       updateProductStock,
       refreshProducts,
       refreshSales,

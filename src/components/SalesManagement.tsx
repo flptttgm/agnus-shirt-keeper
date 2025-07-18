@@ -9,10 +9,10 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { useToast } from '@/hooks/use-toast';
-import { Percent, BadgePercent, Edit2, X } from 'lucide-react';
+import { Percent, BadgePercent, Edit2, X, Trash2 } from 'lucide-react';
 
 const SalesManagement = () => {
-  const { products, sales, loading, addSale, updateSale } = useStore();
+  const { products, sales, loading, addSale, updateSale, deleteSale } = useStore();
   const { toast } = useToast();
   const [editingSale, setEditingSale] = useState<Sale | null>(null);
   const [saleData, setSaleData] = useState({
@@ -162,6 +162,16 @@ const SalesManagement = () => {
       customerName: '',
       customerPhone: '',
     });
+  };
+
+  const handleDeleteSale = async (saleId: string) => {
+    if (window.confirm('Tem certeza que deseja excluir esta venda? O estoque será restaurado.')) {
+      try {
+        await deleteSale(saleId);
+      } catch (error) {
+        // Error handling is done in the hook
+      }
+    }
   };
 
   const handleDiscountChange = (discount: string) => {
@@ -470,15 +480,28 @@ const SalesManagement = () => {
                         )}
                       </td>
                       <td className="py-2">
-                        <Button
-                          variant="outline"
-                          size="sm"
-                          onClick={() => handleEditSale(sale)}
-                          className="h-8 w-8 p-0"
-                          disabled={editingSale?.id === sale.id}
-                        >
-                          <Edit2 className="h-3 w-3" />
-                        </Button>
+                        <div className="flex gap-1">
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={() => handleEditSale(sale)}
+                            className="h-8 w-8 p-0"
+                            disabled={editingSale?.id === sale.id}
+                            title="Editar venda"
+                          >
+                            <Edit2 className="h-3 w-3" />
+                          </Button>
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={() => handleDeleteSale(sale.id)}
+                            className="h-8 w-8 p-0 text-red-600 hover:text-red-700 hover:bg-red-50"
+                            disabled={editingSale?.id === sale.id}
+                            title="Excluir venda (restaura estoque)"
+                          >
+                            <Trash2 className="h-3 w-3" />
+                          </Button>
+                        </div>
                       </td>
                     </tr>
                   ))}
